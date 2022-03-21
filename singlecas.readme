@@ -1,0 +1,36 @@
+Here is the version of the CAS code when single images are available. Unlike the main version, this one does not require the use of a segmentation map or a weight map.
+Using this version is fairly simple. One thing that is essential is that there are no background/foreground galaxies/stars near the galaxy (or whatever object) of interest. One way to do this is to use the iraf task 'imedit', another way is to use sextractor to detect the objects and then to write a code to replace them with 'sky' -- i.e., you cannot just mask them, but have to actually replace with a copy of the sky. This can be done by using the average sky value with the correct sigma implemented as well. Your best bet is probably to use imedit within IRAF, and the 'a' command which will do this in an interactive way. This however is very time consuming if you have many objects.
+
+The code is: cas.cl
+
+Some quick instructions:
+
+1. Save the file cas.cl into a directory.
+2. Create an input file with the format:
+
+image_name x y x1 x2 y1 y2
+
+one line per object, for each object
+where image_name = the name of the image, which must be a fits file
+x and y is the center of the galaxy
+x1 x2 y1 y2 is the back ground area, which should be about 20-30 pixels in width and contains only the sky.
+
+3. Make sure your imtype = fits in your IRAF login.cl file
+
+4. Before running copy these commands into the command line:
+flpr flpr noao digiphot apphot artdata tables ttools
+
+5. type cl> task $ cas = cas.cl
+then cl> cas
+to run
+
+6. The output file will be:
+ID, C, CE, A, AE, S, SE, bigrad, halfr, flux, sflag
+where: ID: your ID for the object in galaxies.in
+C,CE
+A,AE - The CAS values and their errors
+S,SE
+bigrad - the Petrosian radius
+halfr - the half-light radius
+flux - flux within the Petrosian radius
+sflag - a flag revealing if edge was hit, > 1 if so
